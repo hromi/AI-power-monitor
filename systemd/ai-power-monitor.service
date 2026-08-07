@@ -1,0 +1,28 @@
+[Unit]
+Description=AI power / GPU usage monitoring daemon
+After=multi-user.target
+
+[Service]
+Type=simple
+User=gpu-monitor
+Group=gpu-monitor
+WorkingDirectory=/opt/ai-power-monitor
+# systemd creates and owns this directory for the service user
+StateDirectory=ai-power-monitor
+ExecStart=/usr/bin/python3 -m ai_power_monitor --output-dir /var/lib/ai-power-monitor --interval 10
+# Optional: override interval/output-dir/log-level without editing this unit
+EnvironmentFile=-/etc/default/ai-power-monitor
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/ai-power-monitor
+
+[Install]
+WantedBy=multi-user.target
